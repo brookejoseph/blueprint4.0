@@ -16,43 +16,113 @@ export default function Home() {
     weight: '',
     height: '',
     gender: '',
-    improvementAreas: [],
+    improvement_areas: [],
     budget: '',
     equipment: [],
-    currentHealth: {}
+    current_health: {}
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    const { data, error } = await supabase
-      .from('users')
-      .insert([formData])
-      .select()
-      .single()
+    try {
+      // First create the user profile
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .insert([{
+          ...formData,
+          improvement_areas: formData.improvement_areas,
+          equipment: formData.equipment,
+          current_health: formData.current_health
+        }])
+        .select()
+        .single()
 
-    if (error) {
+      if (userError) throw userError
+
+      // Then create a routine for this user
+      const { data: routineData, error: routineError } = await supabase
+        .from('routines')
+        .insert([{
+          user_id: userData.id,
+          supplements: [],
+          diet: [],
+          exercise: [],
+          sleep_schedule: []
+        }])
+        .select()
+        .single()
+
+      if (routineError) throw routineError
+
+      if (routineData) {
+        window.location.href = `/routine/${routineData.id}`
+      }
+    } catch (error) {
       console.error('Error:', error)
-      return
-    }
-
-    if (data) {
-      window.location.href = `/routine/${data.id}`
+      alert('Failed to create profile and routine. Please try again.')
     }
   }
 
   return (
     <main className="container mx-auto p-4">
-      <form onSubmit={handleSubmit}>
+      <h1 className="text-2xl font-bold mb-4">Create Your Protocol</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input 
           type="text"
           value={formData.name}
           onChange={(e) => setFormData({...formData, name: e.target.value})}
           placeholder="Name"
-          className="border p-2 mb-2"
+          className="w-full p-2 border rounded"
+          required
         />
-        {/* Add other form fields similarly */}
-        <button type="submit" className="bg-blue-500 text-white p-2">
+        <input 
+          type="text"
+          value={formData.age}
+          onChange={(e) => setFormData({...formData, age: e.target.value})}
+          placeholder="Age"
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input 
+          type="text"
+          value={formData.weight}
+          onChange={(e) => setFormData({...formData, weight: e.target.value})}
+          placeholder="Weight"
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input 
+          type="text"
+          value={formData.height}
+          onChange={(e) => setFormData({...formData, height: e.target.value})}
+          placeholder="Height"
+          className="w-full p-2 border rounded"
+          required
+        />
+        <select
+          value={formData.gender}
+          onChange={(e) => setFormData({...formData, gender: e.target.value})}
+          className="w-full p-2 border rounded"
+          required
+        >
+          <option value="">Select Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+        <input 
+          type="text"
+          value={formData.budget}
+          onChange={(e) => setFormData({...formData, budget: e.target.value})}
+          placeholder="Budget"
+          className="w-full p-2 border rounded"
+          required
+        />
+        <button 
+          type="submit" 
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+        >
           Generate Protocol
         </button>
       </form>
