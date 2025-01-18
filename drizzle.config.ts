@@ -1,7 +1,12 @@
-import { defineConfig } from "drizzle-kit";
 
-if (!"postgres://brookejoseph@localhost:5432/brooke") {
-  throw new Error("DATABASE_URL, ensure the database is provisioned");
+import { defineConfig } from "drizzle-kit";
+import { config } from "dotenv";
+
+config();
+
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  throw new Error("DATABASE_URL is required");
 }
 
 export default defineConfig({
@@ -9,6 +14,6 @@ export default defineConfig({
   schema: "./db/schema.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: "postgres://brookejoseph@localhost:5432/brooke",
+    connectionString: dbUrl,
   },
 });
