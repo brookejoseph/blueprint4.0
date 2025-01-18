@@ -3,6 +3,7 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,6 +11,7 @@ const supabase = createClient(
 )
 
 export default function Home() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -31,14 +33,16 @@ export default function Home() {
         .from('users')
         .insert([{
           ...formData,
-          improvement_areas: formData.improvement_areas,
-          equipment: formData.equipment,
-          current_health: formData.current_health
+          age: parseInt(formData.age),
+          weight: parseInt(formData.weight),
+          height: parseInt(formData.height)
         }])
         .select()
         .single()
 
       if (userError) throw userError
+
+      if (!userData?.id) throw new Error('No user ID returned')
 
       // Then create a routine for this user
       const { data: routineData, error: routineError } = await supabase
@@ -48,7 +52,10 @@ export default function Home() {
           supplements: [],
           diet: [],
           exercise: [],
-          sleep_schedule: []
+          sleep_schedule: [],
+          metrics: {},
+          protocol_links: {},
+          embedded_sections: []
         }])
         .select()
         .single()
@@ -56,7 +63,7 @@ export default function Home() {
       if (routineError) throw routineError
 
       if (routineData) {
-        window.location.href = `/routine/${routineData.id}`
+        router.push(`/routine/${routineData.id}`)
       }
     } catch (error) {
       console.error('Error:', error)
@@ -77,7 +84,7 @@ export default function Home() {
           required
         />
         <input 
-          type="text"
+          type="number"
           value={formData.age}
           onChange={(e) => setFormData({...formData, age: e.target.value})}
           placeholder="Age"
@@ -85,7 +92,7 @@ export default function Home() {
           required
         />
         <input 
-          type="text"
+          type="number"
           value={formData.weight}
           onChange={(e) => setFormData({...formData, weight: e.target.value})}
           placeholder="Weight"
@@ -93,7 +100,7 @@ export default function Home() {
           required
         />
         <input 
-          type="text"
+          type="number"
           value={formData.height}
           onChange={(e) => setFormData({...formData, height: e.target.value})}
           placeholder="Height"
