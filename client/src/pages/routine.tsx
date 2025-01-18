@@ -9,9 +9,14 @@ import type { RoutineData, EmbeddedSection } from "@/lib/types";
 export default function Routine() {
   const { id } = useParams();
 
-  const { data: routine, isLoading } = useQuery<RoutineData>({
+  const { data: routine, isLoading, error } = useQuery<RoutineData>({
     queryKey: [`/api/routines/${id}`],
+    enabled: !!id && id !== 'undefined',
   });
+
+  if (error) {
+    return <div className="container mx-auto p-8">Error: {(error as Error).message}</div>;
+  }
 
   if (isLoading) {
     return <div className="container mx-auto p-8">Loading...</div>;

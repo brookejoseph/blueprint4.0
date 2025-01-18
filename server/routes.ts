@@ -51,6 +51,9 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/routines", async (req, res) => {
     try {
       const userData = req.body;
+      if (!userData) {
+        return res.status(400).json({ error: "No user data provided" });
+      }
       console.log('Creating user with data:', userData);
 
       // Create user with all questionnaire data
@@ -100,6 +103,10 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/routines/:id", async (req, res) => {
     try {
       const routineId = parseInt(req.params.id);
+      if (isNaN(routineId)) {
+        console.log('Invalid routine ID');
+        return res.status(400).json({ error: "Invalid routine ID" });
+      }
       console.log('Fetching routine with ID:', routineId);
 
       const routine = await db.query.routines.findFirst({

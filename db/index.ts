@@ -1,6 +1,8 @@
 import { drizzle } from "drizzle-orm/neon-serverless";
 import ws from "ws";
 import * as schema from "@db/schema";
+import { WebSocket } from "ws";
+
 
 if (!"postgres://brookejoseph@localhost:5432/brooke") {
   throw new Error(
@@ -11,5 +13,8 @@ if (!"postgres://brookejoseph@localhost:5432/brooke") {
 export const db = drizzle({
   connection: "postgres://brookejoseph@localhost:5432/brooke",
   schema,
-  ws: ws,
+  webSocket: {
+    constructor: WebSocket,
+    connectionString: "postgres://brookejoseph@localhost:5432/brooke"
+  }
 });
