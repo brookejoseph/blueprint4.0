@@ -1,0 +1,60 @@
+8:36:57 AM [express] POST /api/routines 500 in 8ms :: {"error":"Failed to create routine"}
+8:44:58 a.m. [vite] hmr update /src/App.tsx?v=_sJEloH9pBe_8DH3kuhCy, /src/index.css?v=_sJEloH9pBe_8DH3kuhCy
+8:45:03 a.m. [vite] hmr update /src/App.tsx?v=_sJEloH9pBe_8DH3kuhCy, /src/index.css?v=_sJEloH9pBe_8DH3kuhCy (x2)
+8:45:03 a.m. [vite] hmr update /src/App.tsx?v=_sJEloH9pBe_8DH3kuhCy, /src/index.css?v=_sJEloH9pBe_8DH3kuhCy (x3)
+8:45:05 a.m. [vite] hmr update /src/App.tsx?v=_sJEloH9pBe_8DH3kuhCy, /src/index.css?v=_sJEloH9pBe_8DH3kuhCy (x4)
+8:45:05 a.m. [vite] hmr update /src/App.tsx?v=_sJEloH9pBe_8DH3kuhCy, /src/index.css?v=_sJEloH9pBe_8DH3kuhCy (x5)
+8:45:05 a.m. [vite] hmr update /src/App.tsx?v=_sJEloH9pBe_8DH3kuhCy, /src/index.css?v=_sJEloH9pBe_8DH3kuhCy (x6)
+Creating user with data: {
+  name: 'Brooke Joseph',
+  age: 90,
+  gender: 'female',
+  improvementAreas: [ 'sleep', 'fitness', 'hormones' ],
+  budget: '',
+  equipment: [ 'cold-plunge', 'infrared-sauna', 'peptide-injections' ],
+  currentHealth: [ 'supplements', 'tracking-glucose' ]
+}
+Error creating routine: ErrorEvent {
+  [Symbol(kTarget)]: WebSocket {
+    _events: [Object: null prototype] {
+      error: [Function],
+      message: [Function],
+      close: [Function],
+      open: [Function]
+    },
+    _eventsCount: 4,
+    _maxListeners: undefined,
+    _binaryType: 'arraybuffer',
+    _closeCode: 1006,
+    _closeFrameReceived: false,
+    _closeFrameSent: false,
+    _closeMessage: <Buffer >,
+    _closeTimer: null,
+    _errorEmitted: true,
+    _extensions: {},
+    _paused: false,
+    _protocol: '',
+    _readyState: 3,
+    _receiver: null,
+    _sender: null,
+    _socket: null,
+    _bufferedAmount: 0,
+    _isServer: false,
+    _redirects: 0,
+    _autoPong: true,
+    _url: 'wss://localhost/v2',
+    _req: null,
+    [Symbol(shapeMode)]: false,
+    [Symbol(kCapture)]: false
+  },
+  [Symbol(kType)]: 'error',
+  [Symbol(kError)]: AggregateError
+      at __node_internal_ (node:internal/errors:174:15)
+      at internalConnectMultiple (node:net:1114:18)
+      at afterConnectMultiple (node:net:1667:5) {
+    code: 'ECONNREFUSED',
+    [errors]: [ [Error], [Error] ]
+  },
+  [Symbol(kMessage)]: ''
+}
+8:45:20 AM [express] POST /api/routines 500 in 7ms :: {"error":"Failed to create routine"}
