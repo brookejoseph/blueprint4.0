@@ -86,6 +86,15 @@ export function registerRoutes(app: Express): Server {
       console.log('Generated routine:', routine);
 
       // Save routine with protocol links and embedded sections
+      console.log('Attempting to save routine with data:', {
+        user_id: user.id,
+        supplements: routine.supplements,
+        diet: routine.diet,
+        exercise: routine.exercise,
+        sleep_schedule: routine.sleepSchedule,
+        metrics: routine.metrics,
+      });
+
       const { data: savedRoutine, error: routineError } = await supabase
         .from('routines')
         .insert({
@@ -101,9 +110,12 @@ export function registerRoutes(app: Express): Server {
         .select()
         .single();
 
-      if (routineError) throw routineError;
+      if (routineError) {
+        console.error('Supabase error saving routine:', routineError);
+        throw routineError;
+      }
 
-      console.log('Saved routine:', savedRoutine);
+      console.log('Successfully saved routine:', savedRoutine);
       res.json(savedRoutine);
     } catch (error) {
       console.error('Error creating routine:', error);

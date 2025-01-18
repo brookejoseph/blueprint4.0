@@ -38,16 +38,31 @@ export default function Questionnaire() {
 
   const createRoutine = useMutation({
     mutationFn: async (data: UserFormData) => {
+      console.log('Submitting form data:', data);
       const response = await fetch("/api/routines", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      return response.json();
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server error:', errorData);
+        throw new Error(errorData.message || 'Failed to create routine');
+      }
+      
+      const result = await response.json();
+      console.log('Server response:', result);
+      return result;
     },
     onSuccess: (data) => {
+      console.log('Redirecting to routine:', data.id);
       setLocation(`/routine/${data.id}`);
     },
+    onError: (error) => {
+      console.error('Mutation error:', error);
+      alert('Failed to create routine. Please try again.');
+    }
   });
 
   const nextStep = () => {

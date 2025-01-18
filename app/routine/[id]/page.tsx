@@ -17,25 +17,35 @@ export default function RoutinePage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchRoutine = async () => {
       try {
+        console.log('Fetching routine with ID:', params.id);
+        
         const { data, error } = await supabase
           .from('routines')
           .select('*')
           .eq('id', params.id)
           .single()
 
-        if (error) throw error
+        if (error) {
+          console.error('Supabase error:', error);
+          throw error;
+        }
 
-        setRoutine(data)
+        console.log('Fetched routine data:', data);
+        setRoutine(data);
       } catch (err: any) {
-        setError(err.message)
-        console.error('Error fetching routine:', err)
+        setError(err.message);
+        console.error('Error fetching routine:', err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
     if (params.id) {
-      fetchRoutine()
+      fetchRoutine();
+    } else {
+      console.error('No routine ID provided');
+      setError('No routine ID provided');
+      setLoading(false);
     }
   }, [params.id])
 
