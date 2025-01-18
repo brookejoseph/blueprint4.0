@@ -56,21 +56,29 @@ export function registerRoutes(app: Express): Server {
       console.log('Creating user with data:', userData);
 
       // Create user with all questionnaire data
-      const { data: user, error: userError } = await supabase
-        .from('users')
-        .insert({
-          name: userData.name,
-          age: userData.age,
-          gender: userData.gender,
-          improvement_areas: userData.improvementAreas,
-          budget: userData.budget,
-          equipment: userData.equipment,
-          current_health: userData.currentHealth,
-        })
-        .select()
-        .single();
+      try {
+        const { data: user, error: userError } = await supabase
+          .from('users')
+          .insert({
+            name: userData.name,
+            age: userData.age,
+            gender: userData.gender,
+            improvement_areas: userData.improvementAreas,
+            budget: userData.budget,
+            equipment: userData.equipment,
+            current_health: userData.currentHealth,
+          })
+          .select()
+          .single();
 
-      if (userError) throw userError;
+        if (userError) {
+          console.error('User creation error:', userError);
+          throw userError;
+        }
+
+        if (!user) {
+          throw new Error('User creation failed - no user returned');
+        }
 
       console.log('User created:', user);
 
@@ -95,31 +103,49 @@ export function registerRoutes(app: Express): Server {
         metrics: routine.metrics,
       });
 
+      const routineData = {
+        user_id: user.id,
+        supplements: routine.supplements,
+        diet: routine.diet,
+        exercise: routine.exercise,
+        sleep_schedule: routine.sleepSchedule,
+        metrics: routine.metrics,
+        protocol_links: routine.protocolLinks,
+        embedded_sections: routine.embeddedSections,
+      };
+
+      console.log('Attempting to save routine with data:', routineData);
+
       const { data: savedRoutine, error: routineError } = await supabase
         .from('routines')
-        .insert({
-          user_id: user.id,
-          supplements: routine.supplements,
-          diet: routine.diet,
-          exercise: routine.exercise,
-          sleep_schedule: routine.sleepSchedule,
-          metrics: routine.metrics,
-          protocol_links: routine.protocolLinks,
-          embedded_sections: routine.embeddedSections,
-        })
+        .insert(routineData)
         .select()
         .single();
 
       if (routineError) {
         console.error('Supabase error saving routine:', routineError);
-        throw routineError;
+        throw new Error(`Failed to save routine: ${routineError.message}`);
+      }
+
+      if (!savedRoutine) {
+        throw new Error('Routine creation failed - no routine returned');
       }
 
       console.log('Successfully saved routine:', savedRoutine);
       res.json(savedRoutine);
-    } catch (error) {
-      console.error('Error creating routine:', error);
-      res.status(500).json({ error: "Failed to create routine" });
+    } catch (error: any) {
+        console.error('Error creating routine:', error);
+        res.status(500).json({ 
+          error: error.message || "Failed to create routine",
+          details: error
+        });
+      }
+    } catch (error: any) {
+      console.error('Error in route handler:', error);
+      res.status(500).json({ 
+        error: error.message || "Failed to create routine",
+        details: error
+      });
     }
   });
 
