@@ -1,8 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { db } from "@db";
-import { routines, users, metrics, protocolSections } from "@db/schema";
-import { eq } from "drizzle-orm";
+import { supabase } from "@db";
+import type { User, Routine } from "@db/schema";
 import { scrapeProtocolSections, findRelevantSections } from "./utils/protocol-scraper";
 
 const PROTOCOL_URL = "https://protocol.bryanjohnson.com"; // Add PROTOCOL_URL constant
@@ -57,15 +56,21 @@ export function registerRoutes(app: Express): Server {
       console.log('Creating user with data:', userData);
 
       // Create user with all questionnaire data
-      const [user] = await db.insert(users).values({
-        name: userData.name,
-        age: userData.age,
-        gender: userData.gender,
-        improvementAreas: userData.improvementAreas,
-        budget: userData.budget,
-        equipment: userData.equipment,
-        currentHealth: userData.currentHealth,
-      }).returning();
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .insert({
+          name: userData.name,
+          age: userData.age,
+          gender: userData.gender,
+          improvement_areas: userData.improvementAreas,
+          budget: userData.budget,
+          equipment: userData.equipment,
+          current_health: userData.currentHealth,
+        })
+        .select()
+        .single();
+
+      if (userError) throw userError;
 
       console.log('User created:', user);
 
@@ -81,16 +86,22 @@ export function registerRoutes(app: Express): Server {
       console.log('Generated routine:', routine);
 
       // Save routine with protocol links and embedded sections
-      const [savedRoutine] = await db.insert(routines).values({
-        userId: user.id,
-        supplements: routine.supplements,
-        diet: routine.diet,
-        exercise: routine.exercise,
-        sleepSchedule: routine.sleepSchedule,
-        metrics: routine.metrics,
-        protocolLinks: routine.protocolLinks,
-        embeddedSections: routine.embeddedSections,
-      }).returning();
+      const { data: savedRoutine, error: routineError } = await supabase
+        .from('routines')
+        .insert({
+          user_id: user.id,
+          supplements: routine.supplements,
+          diet: routine.diet,
+          exercise: routine.exercise,
+          sleep_schedule: routine.sleepSchedule,
+          metrics: routine.metrics,
+          protocol_links: routine.protocolLinks,
+          embedded_sections: routine.embeddedSections,
+        })
+        .select()
+        .single();
+
+      if (routineError) throw routineError;
 
       console.log('Saved routine:', savedRoutine);
       res.json(savedRoutine);
@@ -109,9 +120,13 @@ export function registerRoutes(app: Express): Server {
       }
       console.log('Fetching routine with ID:', routineId);
 
-      const routine = await db.query.routines.findFirst({
-        where: eq(routines.id, routineId),
-      });
+      const { data: routine, error: routineError } = await supabase
+        .from('routines')
+        .select('*')
+        .eq('id', routineId)
+        .single();
+
+      if (routineError) throw routineError;
 
       if (!routine) {
         console.log('Routine not found for ID:', routineId);
