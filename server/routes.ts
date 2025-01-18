@@ -13,6 +13,7 @@ async function initializeProtocolSections() {
   try {
     // Check if we already have sections in the database
     const existingSections = await db.query.protocolSections.findMany();
+    console.log("within the init function existingSections ",existingSections);
 
     if (existingSections.length === 0) {
       // Scrape and store sections if none exist
